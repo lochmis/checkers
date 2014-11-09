@@ -1,0 +1,23 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package uk.co.lochman.checkers;
+
+/**
+ *
+ * @author Radek
+ */
+public class Checker {
+    private final String color;
+    
+    public Checker(String color){
+        this.color = color;
+    }
+    
+    public String getColor(){
+        return this.color;
+    }
+    
+}
