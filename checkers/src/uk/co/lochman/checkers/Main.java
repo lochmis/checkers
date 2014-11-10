@@ -9,15 +9,13 @@ package uk.co.lochman.checkers;
  *
  * @author Radek
  */
-public class Checker {
-    private final String color;
-    
-    public Checker(String color){
-        this.color = color;
-    }
-    
-    public String getColor(){
-        return this.color;
+public class Main {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // TODO code application logic here
     }
     
 }
