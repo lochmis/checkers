@@ -5,6 +5,7 @@
  */
 package uk.co.lochman.checkers;
 
+//import com.google.common.base.Objects;
 import java.util.Vector;
 
 /**
@@ -32,15 +33,24 @@ public class CheckersSearch {
     void printState(Node node) { /* print board state */
 
         System.out.println("\n");
-        for (int r = 0; r < 4; r++) {
+        for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 4; c++) {
-                int player = node.state[(r * 8) + c];
-                pr(" . " + name(player));
+                if (node.state[r][c] != null){
+                    int player = node.state[r][c].getColor();
+                    pr(" . " + name(player));
+                } else {
+                    pr(" . .");
+                }
             }
             pr("\n");
-            for (int c = 4; c < 8; c++) {
-                int player = node.state[(r * 8) + c];
-                pr(" " + name(player) + " .");
+            r++;
+            for (int c = 0; c < 4; c++) {
+                if (node.state[r][c] != null){
+                    int player = node.state[r][c].getColor();
+                    pr(" " + name(player) + " .");
+                } else {
+                    pr(" . .");
+                }                
             }
             pr("\n");
         }
@@ -50,16 +60,18 @@ public class CheckersSearch {
     /**
      * decide whether board state s is won for player p
      */
-    boolean wonFor(int s[], int p) {
-        for (int field : s) {
-            if (-p == field) {
-                return false;
+    boolean wonFor(Checker[][] state, int player) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++){
+                if (state[row][col] != null && state[row][col].getColor() == -player) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
-    int winnerOf(int state[]) {
+    int winnerOf(Checker[][] state) {
         int player = 0;
         if (wonFor(state, 1)) {
             player = 1;
@@ -79,8 +91,7 @@ public class CheckersSearch {
         } else if (depth > 0) {
             Vector<Node> successors = space.getSuccessors(node, -player);
             if (successors.size() == 0) { /* draw */
-
-                value = 1;
+                value = -1;
             } else {
                 for (Node successor : successors) {
                     successor.evaluation = evaluate(successor, -player, depth - 1);

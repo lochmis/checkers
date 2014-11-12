@@ -13,28 +13,39 @@ import java.util.Vector;
  */
 public class Node {
 
-    int state[] = new int[32];
+    Checker state[][] = new Checker[8][4];
     int evaluation = -1;
     Node parent = null;
 
-    Node(int s[], Node parent) {
-        System.arraycopy(s, 0, state, 0, 32);
+    Node(Checker state[][], Node parent) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++) {
+                this.state[row][col] = state[row][col];
+            }
+        }
         this.parent = parent;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int field : state) {
-            sb.append(field);
-            sb.append(" ");
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++) {
+                sb.append(state[row][col]);
+                sb.append(" ");
+            }
+            sb.append("\n");
         }
         return sb.toString();
     }
 
-    int[] getStateCopy() {
-        int[] copy = new int[32];
-        System.arraycopy(state, 0, copy, 0, 32);
+    Checker[][] getStateCopy() {
+        Checker[][] copy = new Checker[8][4];
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++) {
+                copy[row][col] = state[row][col];
+            }
+        }
         return copy;
     }
 
