@@ -52,7 +52,9 @@ public class CheckersSearch {
      */
     boolean wonFor(int s[], int p) {
         for (int field : s) {
-            if (-p==field) return false;
+            if (-p == field) {
+                return false;
+            }
         }
         return true;
     }
@@ -67,19 +69,21 @@ public class CheckersSearch {
         return player;
     }
 
-    int evaluate(Node node, int player) { /* using NEGMAX */
+    int evaluate(Node node, int player, int depth) { /* using NEGMAX */
+
         int value = 0;
         if (wonFor(node.state, player)) {
             value = 1;
         } else if (wonFor(node.state, -player)) {
             value = -1;
-        } else {
+        } else if (depth > 0) {
             Vector<Node> successors = space.getSuccessors(node, -player);
             if (successors.size() == 0) { /* draw */
-                value = 0;
+
+                value = 1;
             } else {
                 for (Node successor : successors) {
-                    successor.evaluation = evaluate(successor, -player);
+                    successor.evaluation = evaluate(successor, -player, depth - 1);
                     if (successor.evaluation > value) {
                         value = successor.evaluation;
                     }
@@ -95,23 +99,29 @@ public class CheckersSearch {
         Node node = space.getRoot();
         Vector<Node> bestNodes = new Vector<Node>();
         printState(node);
-        while ((p = winnerOf(node.state)) == 0) { /* while no winner */
 
+        while ((p = winnerOf(node.state)) == 0) { /* while no winner */
+            System.out.println(player + " is making a move");
             Vector<Node> successors = space.getSuccessors(node, player);
             int maxValue = -Integer.MAX_VALUE;
             bestNodes.clear();
-            for (Node newNode : successors) {
-                int value = evaluate(newNode, player);
-                if (value == maxValue || player == -1) {
-                    bestNodes.add(newNode);
-                } /* ensure random opponent */ else if (value > maxValue) {
-                    bestNodes.clear();
-                    bestNodes.add(newNode);
-                    maxValue = value;
+            if (player == 1) {
+                for (Node newNode : successors) {
+                    int value = evaluate(newNode, player, 7);
+                    pr("" + value);
+                    if (value == maxValue) {
+                        bestNodes.add(newNode);
+                    } /* ensure random opponent */ else if (value > maxValue) {
+                        bestNodes.clear();
+                        bestNodes.add(newNode);
+                        maxValue = value;
+                    }
                 }
+            } else {
+                bestNodes.addAll(successors);
             }
-            if (successors.isEmpty()) { /* game drawn */
-
+            if (successors.isEmpty()) { 
+                p = -player;
                 break;
             } else {
                 pr("State after new " + name(player) + " (" + player + ")");
@@ -128,4 +138,3 @@ public class CheckersSearch {
         new CheckersSearch().run();
     }
 }
-

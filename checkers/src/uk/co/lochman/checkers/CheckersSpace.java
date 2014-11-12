@@ -22,6 +22,14 @@ public class CheckersSpace {
                       -1,-1,-1,-1,
                       -1,-1,-1,-1,
                       -1,-1,-1,-1};
+//        int state[] = {1, 1, 1, 1,
+//                       1, 1, 1, 1,
+//                       1, 1, 1, 1,
+//                       0, 0,-1, 0,
+//                       0, 0, 0, 0,
+//                       0, 0,-1, 0,
+//                       0, 0, 0, 0,
+//                       0, 0, 0, 0,};
         return new Node(state, null);
     }
 
@@ -52,10 +60,11 @@ public class CheckersSpace {
                 }
             }
         }
-        Vector<Node> successors = new Vector<Node>();
-        successors.addAll(moves);
-        successors.addAll(jumps);
-        return successors;
+        if(!jumps.isEmpty()){
+            return jumps;
+        } else {
+            return moves;
+        }
     }
 
     private Vector<Node> checkForWhiteMoves(int row, int col, int player, Node parent) {
@@ -188,7 +197,7 @@ public class CheckersSpace {
                             jumps.addAll(longJumps);
                         }
                     }
-                    if (parent.state[row * 4 + col + 5] == -player && parent.state[row * 4 + 9] == 0) {
+                    if (parent.state[row * 4 + col + 5] == -player && parent.state[row * 4 + col + 9] == 0) {
                         int state[] = parent.getStateCopy();
                         state[row * 4 + col] = 0;
                         state[row * 4 + col + 5] = 0;
@@ -216,7 +225,7 @@ public class CheckersSpace {
                 }
             } else {
                 if (col == 0) {
-                    if (parent.state[row * 4 + col + 4] == -player && parent.state[row * 4 + col + 9] == 0) {
+                    if (parent.state[row * 4 + 4] == -player && parent.state[row * 4 + 9] == 0) {
                         int state[] = parent.getStateCopy();
                         state[row * 4 + col] = 0;
                         state[row * 4 + col + 4] = 0;
@@ -241,7 +250,7 @@ public class CheckersSpace {
                             jumps.addAll(longJumps);
                         }
                     }
-                    if (parent.state[row * 4 + col + 4] == -player && parent.state[row * 4 + 9] == 0) {
+                    if (parent.state[row * 4 + col + 4] == -player && parent.state[row * 4 + col + 9] == 0) {
                         int state[] = parent.getStateCopy();
                         state[row * 4 + col] = 0;
                         state[row * 4 + col + 4] = 0;
@@ -254,7 +263,7 @@ public class CheckersSpace {
                         }
                     }
                 } else {
-                    if (parent.state[row * 4 + 3] == -player && parent.state[row * 4 + 7] == 0) {
+                    if (parent.state[row * 4 + col + 3] == -player && parent.state[row * 4 + col + 7] == 0) {
                         int state[] = parent.getStateCopy();
                         state[row * 4 + col] = 0;
                         state[row * 4 + col + 3] = 0;
@@ -273,7 +282,117 @@ public class CheckersSpace {
     }
 
     private Vector<Node> checkForBlackJumps(int row, int col, int player, Node parent) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Vector<Node> jumps = new Vector<Node>();
+        if (row > 1) {
+            if (row % 2 == 0) {
+                if (col == 0) {
+                    if (parent.state[row * 4 - 3] == -player && parent.state[row * 4 - 7] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 3] = 0;
+                        state[row * 4 + col - 7] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col + 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                } else if (col < 3) {
+                    if (parent.state[row * 4 + col - 3] == -player && parent.state[row * 4 + col - 7] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 3] = 0;
+                        state[row * 4 + col - 7] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col + 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                    if (parent.state[row * 4 + col - 4] == -player && parent.state[row * 4 + col - 9] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 4] = 0;
+                        state[row * 4 + col - 9] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col - 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                } else {
+                    if (parent.state[row * 4 + col - 4] == -player && parent.state[row * 4 + col - 9] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 4] = 0;
+                        state[row * 4 + col - 9] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col - 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                }
+            } else {
+                if (col == 0) {
+                    if (parent.state[row * 4 - 4] == -player && parent.state[row * 4 - 7] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 4] = 0;
+                        state[row * 4 + col - 7] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col + 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                } else if (col < 3) {
+                    if (parent.state[row * 4 + col - 4] == -player && parent.state[row * 4 + col - 7] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 4] = 0;
+                        state[row * 4 + col - 7] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col + 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                    if (parent.state[row * 4 + col - 5] == -player && parent.state[row * 4 + col - 9] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 5] = 0;
+                        state[row * 4 + col - 9] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col - 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                } else {
+                    if (parent.state[row * 4 + col - 5] == -player && parent.state[row * 4 + col - 9] == 0) {
+                        int state[] = parent.getStateCopy();
+                        state[row * 4 + col] = 0;
+                        state[row * 4 + col - 5] = 0;
+                        state[row * 4 + col - 9] = player;
+                        Vector<Node> longJumps = checkForWhiteJumps(row - 2, col - 1, player,new Node(state, parent));
+                        if (longJumps.isEmpty()){
+                            jumps.add(new Node(state, parent));
+                        } else {
+                            jumps.addAll(longJumps);
+                        }
+                    }
+                }
+            }
+        }
+        return jumps;
     }
 
 }
