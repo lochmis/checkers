@@ -32,10 +32,15 @@ public class CheckersSearch {
     void printState(Node node) { /* print board state */
 
         System.out.println("\n");
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 3; c++) {
-                int player = node.state[(r * 3) + c];
-                pr(" " + name(player));
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                int player = node.state[(r * 8) + c];
+                pr(" . " + name(player));
+            }
+            pr("\n");
+            for (int c = 4; c < 8; c++) {
+                int player = node.state[(r * 8) + c];
+                pr(" " + name(player) + " .");
             }
             pr("\n");
         }
@@ -46,15 +51,10 @@ public class CheckersSearch {
      * decide whether board state s is won for player p
      */
     boolean wonFor(int s[], int p) {
-        boolean b = (s[0] == p && s[1] == p && s[2] == p)
-                || (s[3] == p && s[4] == p && s[5] == p)
-                || (s[6] == p && s[7] == p && s[8] == p)
-                || (s[0] == p && s[3] == p && s[6] == p)
-                || (s[1] == p && s[4] == p && s[7] == p)
-                || (s[2] == p && s[5] == p && s[8] == p)
-                || (s[0] == p && s[4] == p && s[8] == p)
-                || (s[2] == p && s[4] == p && s[6] == p);
-        return b;
+        for (int field : s) {
+            if (-p==field) return false;
+        }
+        return true;
     }
 
     int winnerOf(int state[]) {
@@ -68,7 +68,6 @@ public class CheckersSearch {
     }
 
     int evaluate(Node node, int player) { /* using NEGMAX */
-
         int value = 0;
         if (wonFor(node.state, player)) {
             value = 1;
@@ -77,11 +76,9 @@ public class CheckersSearch {
         } else {
             Vector<Node> successors = space.getSuccessors(node, -player);
             if (successors.size() == 0) { /* draw */
-
                 value = 0;
             } else {
-                for (int i = 0; i < successors.size(); i++) {
-                    Node successor = successors.get(i);
+                for (Node successor : successors) {
                     successor.evaluation = evaluate(successor, -player);
                     if (successor.evaluation > value) {
                         value = successor.evaluation;
@@ -103,8 +100,7 @@ public class CheckersSearch {
             Vector<Node> successors = space.getSuccessors(node, player);
             int maxValue = -Integer.MAX_VALUE;
             bestNodes.clear();
-            for (int i = 0; i < successors.size(); i++) {
-                Node newNode = successors.get(i);
+            for (Node newNode : successors) {
                 int value = evaluate(newNode, player);
                 if (value == maxValue || player == -1) {
                     bestNodes.add(newNode);
