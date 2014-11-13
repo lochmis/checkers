@@ -17,7 +17,7 @@ public class CheckersSearch {
     CheckersSpace space = new CheckersSpace();
 
     String name(int player) {
-        String s = ".";
+        String s = " ";
         if (player == 1) {
             s = "W";
         } else if (player == -1) {
@@ -39,7 +39,7 @@ public class CheckersSearch {
                     int player = node.state[r][c].getColor();
                     pr(" . " + name(player));
                 } else {
-                    pr(" . .");
+                    pr(" .  ");
                 }
             }
             pr("\n");
@@ -49,7 +49,7 @@ public class CheckersSearch {
                     int player = node.state[r][c].getColor();
                     pr(" " + name(player) + " .");
                 } else {
-                    pr(" . .");
+                    pr("   .");
                 }                
             }
             pr("\n");
@@ -118,7 +118,7 @@ public class CheckersSearch {
             bestNodes.clear();
             if (player == 1) {
                 for (Node newNode : successors) {
-                    int value = evaluate(newNode, player, 7);
+                    int value = evaluate(newNode, player, 5);
                     pr("" + value);
                     if (value == maxValue) {
                         bestNodes.add(newNode);
