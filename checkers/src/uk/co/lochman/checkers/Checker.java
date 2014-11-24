@@ -29,4 +29,10 @@ public class Checker {
     public int getColor() {
         return color;
     }
+    
+    public Checker getCopy() {
+        Checker newChecker = new Checker(color);
+        newChecker.setKing(king);
+        return newChecker;
+    }
 }

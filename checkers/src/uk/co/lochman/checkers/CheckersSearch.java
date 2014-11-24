@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.co.lochman.checkers;
 
-//import com.google.common.base.Objects;
 import java.util.Vector;
 
 /**
@@ -37,7 +31,11 @@ public class CheckersSearch {
             for (int c = 0; c < 4; c++) {
                 if (node.state[r][c] != null){
                     int player = node.state[r][c].getColor();
-                    pr(" . " + name(player));
+                    if (node.state[r][c].isKing()){
+                        pr(" ." + name(player) + "K");
+                    } else {
+                        pr(" . " + name(player));
+                    }
                 } else {
                     pr(" .  ");
                 }
@@ -47,7 +45,11 @@ public class CheckersSearch {
             for (int c = 0; c < 4; c++) {
                 if (node.state[r][c] != null){
                     int player = node.state[r][c].getColor();
-                    pr(" " + name(player) + " .");
+                    if (node.state[r][c].isKing()){
+                        pr(name(player) + "K .");
+                    } else {
+                        pr(" " + name(player) + " .");
+                    }
                 } else {
                     pr("   .");
                 }                
@@ -81,7 +83,7 @@ public class CheckersSearch {
         return player;
     }
 
-    int evaluate(Node node, int player, int depth) { /* using NEGMAX */
+    int evaluate(Node node, int player, int depth) {
 
         int value = 0;
         if (wonFor(node.state, player)) {
@@ -90,8 +92,8 @@ public class CheckersSearch {
             value = -1;
         } else if (depth > 0) {
             Vector<Node> successors = space.getSuccessors(node, -player);
-            if (successors.size() == 0) { /* draw */
-                value = -1;
+            if (successors.isEmpty()) {
+                value = 1;
             } else {
                 for (Node successor : successors) {
                     successor.evaluation = evaluate(successor, -player, depth - 1);
@@ -118,14 +120,13 @@ public class CheckersSearch {
             bestNodes.clear();
             if (player == 1) {
                 for (Node newNode : successors) {
-                    int value = evaluate(newNode, player, 5);
-                    pr("" + value);
-                    if (value == maxValue) {
+                    newNode.evaluation = evaluate(newNode, player, 8);
+                    if (newNode.evaluation == maxValue) {
                         bestNodes.add(newNode);
-                    } /* ensure random opponent */ else if (value > maxValue) {
+                    } /* ensure random opponent */ else if (newNode.evaluation > maxValue) {
                         bestNodes.clear();
                         bestNodes.add(newNode);
-                        maxValue = value;
+                        maxValue = newNode.evaluation;
                     }
                 }
             } else {
@@ -135,9 +136,10 @@ public class CheckersSearch {
                 p = -player;
                 break;
             } else {
-                pr("State after new " + name(player) + " (" + player + ")");
                 int randomIndex = (int) (Math.random() * bestNodes.size());
                 node = bestNodes.get(randomIndex);
+                System.out.println("State after new " + name(player) + ". (" + node.evaluation + ")");
+                //System.out.println("\nChosen value: " + node.evaluation);
                 printState(node);
                 player = -player;
             }
