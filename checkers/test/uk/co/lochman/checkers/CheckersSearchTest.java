@@ -63,7 +63,7 @@ public class CheckersSearchTest {
     public void givenNoPlayer_whenCheckingName_DotIsReturned() {
         int player = 0;
         CheckersSearch instance = new CheckersSearch();
-        String expResult = ".";
+        String expResult = " ";
         String result = instance.name(player);
         assertEquals(expResult, result);
     }
@@ -73,7 +73,7 @@ public class CheckersSearchTest {
      */
     @Test
     public void givenPlayerWhiteAndWhitesOnlyBoard_whenCheckingIfWin_thenTrueExpected() {
-        int[] s = {1,1,1,1,1,1,1,0,0,0,0,0,0,1};
+        Checker[][] s = makeState(new int[] {1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         int p = 1;
         CheckersSearch instance = new CheckersSearch();
         boolean expResult = true;
@@ -83,7 +83,7 @@ public class CheckersSearchTest {
     
     @Test
     public void givenPlayerBlackAndBlacksOnlyBoard_whenCheckingIfWin_thenTrueExpected() {
-        int[] s = {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,-1};
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         int p = -1;
         CheckersSearch instance = new CheckersSearch();
         boolean expResult = true;
@@ -93,7 +93,7 @@ public class CheckersSearchTest {
     
     @Test
     public void givenPlayerBlackAndMixedBoard_whenCheckingIfWin_thenFalseExpected() {
-        int[] s = {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1};
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         int p = -1;
         CheckersSearch instance = new CheckersSearch();
         boolean expResult = false;
@@ -103,7 +103,7 @@ public class CheckersSearchTest {
     
     @Test
     public void givenPlayerWhiteAndMixedBoard_whenCheckingIfWin_thenFalseExpected() {
-        int[] s = {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1};
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         int p = 1;
         CheckersSearch instance = new CheckersSearch();
         boolean expResult = false;
@@ -113,7 +113,7 @@ public class CheckersSearchTest {
     
     @Test
     public void givenNoPlayerAndMixedBoard_whenCheckingIfWin_thenTrueExpected() {
-        int[] s = {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1};
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         int p = 1;
         CheckersSearch instance = new CheckersSearch();
         boolean expResult = false;
@@ -126,29 +126,104 @@ public class CheckersSearchTest {
      */
     @Test
     public void givenBlackOnlyBoard_whenCheckingWhoWin_thenBlackExpected() {
-        int[] state = {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,-1};
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         CheckersSearch instance = new CheckersSearch();
         int expResult = -1;
-        int result = instance.winnerOf(state);
+        int result = instance.winnerOf(s);
         assertEquals(expResult, result);
     }
     
     @Test
     public void givenWhiteOnlyBoard_whenCheckingWhoWin_thenWhiteExpected() {
-        int[] state = {1,1,1,1,1,1,1,0,0,0,0,0,0,1};
+        Checker[][] s = makeState(new int[] {1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         CheckersSearch instance = new CheckersSearch();
         int expResult = 1;
-        int result = instance.winnerOf(state);
+        int result = instance.winnerOf(s);
         assertEquals(expResult, result);
     }
     
     @Test
     public void givenMixedBoard_whenCheckingWhoWin_thenZeroExpected() {
-        int[] state = {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1};
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
         CheckersSearch instance = new CheckersSearch();
         int expResult = 0;
-        int result = instance.winnerOf(state);
+        int result = instance.winnerOf(s);
         assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void givenMixedBoard_whenEvaluatingState_givenSevenBlackOneWhite_thenExpectMinusSix() {
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+        CheckersSearch instance = new CheckersSearch();
+        int expResult = -6;
+        int result = instance.evaluateState(s);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void givenMixedBoard_whenEvaluatingState_givenSevenWhiteOneBlack_thenExpectSix() {
+        Checker[][] s = makeState(new int[] {1,1,1,1,1,1,1,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+        CheckersSearch instance = new CheckersSearch();
+        int expResult = 6;
+        int result = instance.evaluateState(s);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void givenMixedBoard_whenEvaluatingState_givenSevenWhite_thenExpectHundred() {
+        Checker[][] s = makeState(new int[] {1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+        CheckersSearch instance = new CheckersSearch();
+        int expResult = 100;
+        int result = instance.evaluateState(s);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void givenMixedBoard_whenEvaluatingState_givenSevenBlack_thenExpectMinusHundred() {
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+        CheckersSearch instance = new CheckersSearch();
+        int expResult = -100;
+        int result = instance.evaluateState(s);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void givenMixedBoard_whenEvaluatingState_given4Black2White2WhiteKings_thenExpect4() {
+        Checker[][] s = makeState(new int[] {1,1,1,1,-1,-1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+        s[0][0].setKing(true);
+        s[0][1].setKing(true);
+        CheckersSearch instance = new CheckersSearch();
+        int expResult = 4;
+        int result = instance.evaluateState(s);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void givenMixedBoard_whenEvaluatingState_given2Black2BlackKings4White_thenExpectMinus4() {
+        Checker[][] s = makeState(new int[] {-1,-1,-1,-1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+        s[0][0].setKing(true);
+        s[0][1].setKing(true);
+        CheckersSearch instance = new CheckersSearch();
+        int expResult = -4;
+        int result = instance.evaluateState(s);
+        assertEquals(expResult, result);
+    }
+    
+    private Checker[][] makeState(int[] state){
+        int position = 0;
+        Checker[][] newState = new Checker[8][4];
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++){
+                if (state[position] == 0) {
+                    newState[row][col] = null;
+                    position++;
+                } else {
+                    newState[row][col] = new Checker(state[position]);
+                    position++;
+                }
+            }
+        }
+        return newState;
     }
     
 }

@@ -82,33 +82,65 @@ public class CheckersSearch {
         }
         return player;
     }
-
-    int evaluate(Node node, int player, int depth) {
-
-        int value = 0;
-        if (wonFor(node.state, player)) {
-            value = 1;
-        } else if (wonFor(node.state, -player)) {
-            value = -1;
-        } else if (depth > 0) {
-            Vector<Node> successors = space.getSuccessors(node, -player);
-            if (successors.isEmpty()) {
-                value = 1;
-            } else {
-                for (Node successor : successors) {
-                    successor.evaluation = evaluate(successor, -player, depth - 1);
-                    if (successor.evaluation > value) {
-                        value = successor.evaluation;
+    
+    int evaluateState(Checker[][] state) {
+        int whiteNumber = 0;
+        int blackNumber = 0;
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++){
+                if (state[row][col] != null) {
+                    if (state[row][col].getColor() == 1){
+                        whiteNumber++;
+                        if (state[row][col].isKing()){
+                            whiteNumber += 2;
+                        }
+                    }
+                    if (state[row][col].getColor() == -1){
+                        blackNumber++;
+                        if (state[row][col].isKing()){
+                            blackNumber += 2;
+                        }
                     }
                 }
-                value = -value;
             }
         }
-        return (value);
+        if (whiteNumber == 0) {
+            return -100;
+        } else if (blackNumber == 0) {
+            return 100;
+        } else {
+            return whiteNumber - blackNumber;
+        }
+    }
+
+    int evaluate(Node node, int player, int depth, int alpha, int beta) {
+
+        if (depth < 1) {
+            return player * evaluateState(node.state);
+        }
+        int bestValue = -100;
+        Vector<Node> successors = space.getSuccessors(node, -player);
+        if (successors.isEmpty()) {
+            return 100;
+        }
+        for (Node successor : successors) {
+            successor.evaluation = evaluate(successor, -player, depth - 1, -alpha, -beta);
+            if (-successor.evaluation > bestValue) {
+                bestValue = -successor.evaluation;
+            }
+            if (-successor.evaluation > alpha) {
+                alpha = -successor.evaluation;
+            }
+            if (alpha >= beta){
+                return alpha;
+            }
+        }
+        return bestValue;
     }
 
     void run() {
-        int p, player = 1;
+        int p = 1;
+        int player = 1;
         Node node = space.getRoot();
         Vector<Node> bestNodes = new Vector<Node>();
         printState(node);
@@ -116,11 +148,11 @@ public class CheckersSearch {
         while ((p = winnerOf(node.state)) == 0) { /* while no winner */
             System.out.println(player + " is making a move");
             Vector<Node> successors = space.getSuccessors(node, player);
-            int maxValue = -Integer.MAX_VALUE;
+            int maxValue = -100;
             bestNodes.clear();
             if (player == 1) {
                 for (Node newNode : successors) {
-                    newNode.evaluation = evaluate(newNode, player, 8);
+                    newNode.evaluation = evaluate(newNode, player, 15, Integer.MIN_VALUE, Integer.MAX_VALUE);
                     if (newNode.evaluation == maxValue) {
                         bestNodes.add(newNode);
                     } /* ensure random opponent */ else if (newNode.evaluation > maxValue) {
@@ -138,7 +170,7 @@ public class CheckersSearch {
             } else {
                 int randomIndex = (int) (Math.random() * bestNodes.size());
                 node = bestNodes.get(randomIndex);
-                System.out.println("State after new " + name(player) + ". (" + node.evaluation + ")");
+                System.out.println("Space evaluation after " + name(player) + " move is (" + node.evaluation + ")");
                 //System.out.println("\nChosen value: " + node.evaluation);
                 printState(node);
                 player = -player;

@@ -14,7 +14,7 @@ import java.util.Vector;
 public class CheckersSpace {
 
     public Node getRoot() {
-        Checker state[][] = {
+        Checker[][] state = {
             {new Checker(1), new Checker(1), new Checker(1), new Checker(1)},
             {new Checker(1), new Checker(1), new Checker(1), new Checker(1)},
             {new Checker(1), new Checker(1), new Checker(1), new Checker(1)},
