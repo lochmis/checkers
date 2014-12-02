@@ -6,10 +6,24 @@ import java.util.Vector;
  *
  * @author Radek
  */
-public class CheckersSearch {
-
-    CheckersSpace space = new CheckersSpace();
-
+public class CheckersGame {
+    private CheckersSpace space = new CheckersSpace();
+    private Node currentNode = space.getRoot();
+    public int difficulty;
+    
+    public Node getCurrentNode() {
+        return currentNode;
+    }
+    
+    public CheckersSpace getSpace() {
+        return space;
+    }
+    
+    public void setCurrentNode(Checker[][] newState) {
+        Node newNode = new Node(newState, currentNode);
+        this.currentNode = newNode;
+    }
+    
     String name(int player) {
         String s = " ";
         if (player == 1) {
@@ -19,12 +33,12 @@ public class CheckersSearch {
         }
         return s;
     }
-
+    
     void pr(String s) {
         System.out.print(s);
     }
-
-    void printState(Node node) { /* print board state */
+    
+    public void printState(Node node) { /* print board state */
 
         System.out.println("\n");
         for (int r = 0; r < 8; r++) {
@@ -58,7 +72,7 @@ public class CheckersSearch {
         }
         pr("\n");
     }
-
+    
     boolean wonFor(Checker[][] state, int player) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 4; col++){
@@ -134,49 +148,6 @@ public class CheckersSearch {
         }
         return bestValue;
     }
-
-    void run() {
-        int p = 1;
-        int player = 1;
-        Node node = space.getRoot();
-        Vector<Node> bestNodes = new Vector<Node>();
-        printState(node);
-
-        while ((p = winnerOf(node.getState())) == 0) { /* while no winner */
-            System.out.println(player + " is making a move");
-            Vector<Node> successors = space.getSuccessors(node, player);
-            int maxValue = -100;
-            bestNodes.clear();
-            if (player == 1) {
-                for (Node newNode : successors) {
-                    newNode.evaluation = evaluateNode(newNode, player, 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
-                    if (newNode.evaluation == maxValue) {
-                        bestNodes.add(newNode);
-                    } else if (newNode.evaluation > maxValue) {
-                        bestNodes.clear();
-                        bestNodes.add(newNode);
-                        maxValue = newNode.evaluation;
-                    }
-                }
-            } else {
-                bestNodes.addAll(successors);
-            }
-            if (successors.isEmpty()) { 
-                p = -player;
-                break;
-            } else {
-                int randomIndex = (int) (Math.random() * bestNodes.size());
-                node = bestNodes.get(randomIndex);
-                System.out.println("Space evaluation after " + name(player) + " move is (" + node.evaluation + ")");
-                //System.out.println("\nChosen value: " + node.evaluation);
-                printState(node);
-                player = -player;
-            }
-        }
-        pr(p == 0 ? "DRAW" : "GAME WON FOR " + name(p) + "\n\n");
-    }
-
-    public static void main(String args[]) { // do the search
-        new CheckersSearch().run();
-    }
+    
+    
 }

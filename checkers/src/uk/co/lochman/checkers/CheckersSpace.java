@@ -43,14 +43,14 @@ public class CheckersSpace {
         if (player == 1) {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 4; col++) {
-                    if (parent.state[row][col] != null && parent.state[row][col].getColor() == player) {
+                    if (parent.getState()[row][col] != null && parent.getState()[row][col].getColor() == player) {
                         jumps.addAll(checkForWhiteJumps(row, col, player, parent));
-                        if (parent.state[row][col].isKing()){
+                        if (parent.getState()[row][col].isKing()){
                             jumps.addAll(checkForBlackJumps(row, col, player, parent));
                         }
                         if (jumps.isEmpty()) {
                             moves.addAll(checkForWhiteMoves(row, col, parent));
-                            if (parent.state[row][col].isKing()){
+                            if (parent.getState()[row][col].isKing()){
                                 moves.addAll(checkForBlackMoves(row, col, parent));
                             }
                         }
@@ -61,14 +61,14 @@ public class CheckersSpace {
         } else {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 4; col++) {
-                    if (parent.state[row][col] != null && parent.state[row][col].getColor() == player) {
+                    if (parent.getState()[row][col] != null && parent.getState()[row][col].getColor() == player) {
                         jumps.addAll(checkForBlackJumps(row, col, player, parent));
-                        if (parent.state[row][col].isKing()){
+                        if (parent.getState()[row][col].isKing()){
                             jumps.addAll(checkForWhiteJumps(row, col, player, parent));
                         }
                         if (jumps.isEmpty()) {
                             moves.addAll(checkForBlackMoves(row, col, parent));
-                            if (parent.state[row][col].isKing()){
+                            if (parent.getState()[row][col].isKing()){
                                 moves.addAll(checkForWhiteMoves(row, col, parent));
                             }
                         }
@@ -88,7 +88,7 @@ public class CheckersSpace {
         if (row < 7) {
             if (row % 2 == 0) {
                 if (col < 3) {
-                    if (parent.state[row+1][col] == null) {
+                    if (parent.getState()[row+1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+1][col] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -97,7 +97,7 @@ public class CheckersSpace {
                         }
                         moves.add(new Node(state, parent));
                     }
-                    if (parent.state[row+1][col+1] == null) {
+                    if (parent.getState()[row+1][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+1][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -107,7 +107,7 @@ public class CheckersSpace {
                         moves.add(new Node(state, parent));
                     }
                 } else {
-                    if (parent.state[row+1][col] == null) {
+                    if (parent.getState()[row+1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+1][col] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -119,20 +119,20 @@ public class CheckersSpace {
                 }
             } else {
                 if (col > 0) {
-                    if (parent.state[row+1][col] == null) {
+                    if (parent.getState()[row+1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+1][col] = state[row][col].getCopy();
                         state[row][col] = null;
                         moves.add(new Node(state, parent));
                     }
-                    if (parent.state[row+1][col-1] == null) {
+                    if (parent.getState()[row+1][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+1][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
                         moves.add(new Node(state, parent));
                     }
                 } else {
-                    if (parent.state[row+1][col] == null) {
+                    if (parent.getState()[row+1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+1][col] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -149,20 +149,20 @@ public class CheckersSpace {
         if (row > 0) {
             if (row % 2 == 0) {
                 if (col < 3) {
-                    if (parent.state[row-1][col] == null) {
+                    if (parent.getState()[row-1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-1][col] = state[row][col].getCopy();
                         state[row][col] = null;
                         moves.add(new Node(state, parent));
                     }
-                    if (parent.state[row-1][col+1] == null) {
+                    if (parent.getState()[row-1][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-1][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
                         moves.add(new Node(state, parent));
                     }
                 } else {
-                    if (parent.state[row-1][col] == null) {
+                    if (parent.getState()[row-1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-1][col] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -171,7 +171,7 @@ public class CheckersSpace {
                 }
             } else {
                 if (col > 0) {
-                    if (parent.state[row-1][col-1] == null) {
+                    if (parent.getState()[row-1][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-1][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -180,7 +180,7 @@ public class CheckersSpace {
                         }
                         moves.add(new Node(state, parent));
                     }
-                    if (parent.state[row-1][col] == null) {
+                    if (parent.getState()[row-1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-1][col] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -190,7 +190,7 @@ public class CheckersSpace {
                         moves.add(new Node(state, parent));
                     }
                 } else {
-                    if (parent.state[row-1][col] == null) {
+                    if (parent.getState()[row-1][col] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-1][col] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -210,7 +210,7 @@ public class CheckersSpace {
         if (row < 6) {
             if (row % 2 == 0) {
                 if (col == 0) {
-                    if (parent.state[row+1][col+1] != null && parent.state[row+1][col+1].getColor() == -player && parent.state[row+2][col+1] == null) {
+                    if (parent.getState()[row+1][col+1] != null && parent.getState()[row+1][col+1].getColor() == -player && parent.getState()[row+2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -223,7 +223,7 @@ public class CheckersSpace {
                         }
                     }
                 } else if (col < 3) {
-                    if (parent.state[row+1][col+1] != null && parent.state[row+1][col+1].getColor() == -player && parent.state[row+2][col+1] == null) {
+                    if (parent.getState()[row+1][col+1] != null && parent.getState()[row+1][col+1].getColor() == -player && parent.getState()[row+2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -235,7 +235,7 @@ public class CheckersSpace {
                             jumps.addAll(longJumps);
                         }
                     }
-                    if (parent.state[row+1][col] != null && parent.state[row+1][col].getColor() == -player && parent.state[row+2][col-1] == null) {
+                    if (parent.getState()[row+1][col] != null && parent.getState()[row+1][col].getColor() == -player && parent.getState()[row+2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -248,7 +248,7 @@ public class CheckersSpace {
                         }
                     }
                 } else {
-                    if (parent.state[row+1][col] != null && parent.state[row+1][col].getColor() == -player && parent.state[row+2][col-1] == null) {
+                    if (parent.getState()[row+1][col] != null && parent.getState()[row+1][col].getColor() == -player && parent.getState()[row+2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -263,7 +263,7 @@ public class CheckersSpace {
                 }
             } else {
                 if (col == 0) {
-                    if (parent.state[row+1][col] != null && parent.state[row+1][col].getColor() == -player && parent.state[row+2][col+1] == null) {
+                    if (parent.getState()[row+1][col] != null && parent.getState()[row+1][col].getColor() == -player && parent.getState()[row+2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -279,7 +279,7 @@ public class CheckersSpace {
                         }
                     }
                 } else if (col < 3) {
-                    if (parent.state[row+1][col] != null && parent.state[row+1][col].getColor() == -player && parent.state[row+2][col+1] == null) {
+                    if (parent.getState()[row+1][col] != null && parent.getState()[row+1][col].getColor() == -player && parent.getState()[row+2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -294,7 +294,7 @@ public class CheckersSpace {
                             jumps.addAll(longJumps);
                         }
                     }
-                    if (parent.state[row+1][col-1] != null && parent.state[row+1][col-1].getColor() == -player && parent.state[row+2][col-1] == null) {
+                    if (parent.getState()[row+1][col-1] != null && parent.getState()[row+1][col-1].getColor() == -player && parent.getState()[row+2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -310,7 +310,7 @@ public class CheckersSpace {
                         }
                     }
                 } else {
-                    if (parent.state[row+1][col-1] != null && parent.state[row+1][col-1].getColor() == -player && parent.state[row+2][col-1] == null) {
+                    if (parent.getState()[row+1][col-1] != null && parent.getState()[row+1][col-1].getColor() == -player && parent.getState()[row+2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row+2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -336,7 +336,7 @@ public class CheckersSpace {
         if (row > 1) {
             if (row % 2 == 0) {
                 if (col == 0) {
-                    if (parent.state[row-1][col+1] != null && parent.state[row-1][col+1].getColor() == -player && parent.state[row-2][col+1] == null) {
+                    if (parent.getState()[row-1][col+1] != null && parent.getState()[row-1][col+1].getColor() == -player && parent.getState()[row-2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -352,7 +352,7 @@ public class CheckersSpace {
                         }
                     }
                 } else if (col < 3) {
-                    if (parent.state[row-1][col+1] != null && parent.state[row-1][col+1].getColor() == -player && parent.state[row-2][col+1] == null) {
+                    if (parent.getState()[row-1][col+1] != null && parent.getState()[row-1][col+1].getColor() == -player && parent.getState()[row-2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -367,7 +367,7 @@ public class CheckersSpace {
                             jumps.addAll(longJumps);
                         }
                     }
-                    if (parent.state[row-1][col] != null && parent.state[row-1][col].getColor() == -player && parent.state[row-2][col-1] == null) {
+                    if (parent.getState()[row-1][col] != null && parent.getState()[row-1][col].getColor() == -player && parent.getState()[row-2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -383,7 +383,7 @@ public class CheckersSpace {
                         }
                     }
                 } else {
-                    if (parent.state[row-1][col] != null && parent.state[row-1][col].getColor() == -player && parent.state[row-2][col-1] == null) {
+                    if (parent.getState()[row-1][col] != null && parent.getState()[row-1][col].getColor() == -player && parent.getState()[row-2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -401,7 +401,7 @@ public class CheckersSpace {
                 }
             } else {
                 if (col == 0) {
-                    if (parent.state[row-1][col] != null && parent.state[row-1][col].getColor() == -player && parent.state[row-2][col+1] == null) {
+                    if (parent.getState()[row-1][col] != null && parent.getState()[row-1][col].getColor() == -player && parent.getState()[row-2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -414,7 +414,7 @@ public class CheckersSpace {
                         }
                     }
                 } else if (col < 3) {
-                    if (parent.state[row-1][col] != null && parent.state[row-1][col].getColor() == -player && parent.state[row-2][col+1] == null) {
+                    if (parent.getState()[row-1][col] != null && parent.getState()[row-1][col].getColor() == -player && parent.getState()[row-2][col+1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col+1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -426,7 +426,7 @@ public class CheckersSpace {
                             jumps.addAll(longJumps);
                         }
                     }
-                    if (parent.state[row-1][col-1] != null && parent.state[row-1][col-1].getColor() == -player && parent.state[row-2][col-1] == null) {
+                    if (parent.getState()[row-1][col-1] != null && parent.getState()[row-1][col-1].getColor() == -player && parent.getState()[row-2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;
@@ -439,7 +439,7 @@ public class CheckersSpace {
                         }
                     }
                 } else {
-                    if (parent.state[row-1][col-1] != null && parent.state[row-1][col-1].getColor() == -player && parent.state[row-2][col-1] == null) {
+                    if (parent.getState()[row-1][col-1] != null && parent.getState()[row-1][col-1].getColor() == -player && parent.getState()[row-2][col-1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row-2][col-1] = state[row][col].getCopy();
                         state[row][col] = null;

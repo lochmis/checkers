@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.co.lochman.checkers;
-
-import java.util.Vector;
 
 /**
  *
@@ -13,17 +6,25 @@ import java.util.Vector;
  */
 public class Node {
 
-    Checker state[][] = new Checker[8][4];
-    int evaluation = -1;
-    Node parent = null;
+    private Checker[][] state = new Checker[8][4];
+    public int evaluation = -1;
+    public Node parent = null;
+    public int parentRow = 0;
+    public int parentCol = 0;
 
-    Node(Checker state[][], Node parent) {
+    Node(Checker state[][], Node parent, int parentRow, int parentCol) {
+        this.parentRow = parentRow;
+        this.parentCol = parentCol;
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 4; col++) {
                 this.state[row][col] = state[row][col];
             }
         }
         this.parent = parent;
+    }
+    
+    public Checker[][] getState() {
+        return state;
     }
 
     @Override
@@ -47,17 +48,5 @@ public class Node {
             }
         }
         return copy;
-    }
-
-    Vector<Node> getPath(Vector<Node> v) {
-        v.insertElementAt(this, 0);
-        if (parent != null) {
-            v = parent.getPath(v);
-        }
-        return v;
-    }
-
-    Vector<Node> getPath() {
-        return (getPath(new Vector<Node>()));
     }
 }

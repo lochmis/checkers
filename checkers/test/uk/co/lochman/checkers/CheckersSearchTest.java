@@ -209,6 +209,24 @@ public class CheckersSearchTest {
         assertEquals(expResult, result);
     }
     
+    @Test
+    public void givenMixedBoard_whenEvaluatingState_givenRoot_thenExpectZero() {
+        Checker[][] s = {
+            {new Checker(1), new Checker(1), new Checker(1), new Checker(1)},
+            {new Checker(1), new Checker(1), new Checker(1), new Checker(1)},
+            {new Checker(1), new Checker(1), new Checker(1), null},
+            {null, null, null, new Checker(1)},
+            {null, null, null, null},
+            {new Checker(-1), new Checker(-1), new Checker(-1), new Checker(-1)},
+            {new Checker(-1), new Checker(-1), new Checker(-1), new Checker(-1)},
+            {new Checker(-1), new Checker(-1), new Checker(-1), new Checker(-1)}
+        };
+        CheckersSearch instance = new CheckersSearch();
+        int expResult = 0;
+        int result = instance.evaluateState(s);
+        assertEquals(expResult, result);
+    }
+    
     private Checker[][] makeState(int[] state){
         int position = 0;
         Checker[][] newState = new Checker[8][4];
