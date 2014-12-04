@@ -17,10 +17,24 @@ public class CheckersGame {
         return currentNode;
     }
 
-    public boolean aiTurn() {
-        int aiPlayer = activePlayer;
+    public boolean newKing() {
+        int oldKings = 0;
+        int newKings = 0;
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++) {
+                if (currentNode.parent.getState()[row][col] != null && currentNode.parent.getState()[row][col].getColor() == activePlayer && currentNode.parent.getState()[row][col].isKing()) {
+                    oldKings++;
+                }
+                if (currentNode.getState()[row][col] != null && currentNode.getState()[row][col].getColor() == activePlayer && currentNode.getState()[row][col].isKing()) {
+                    newKings++;
+                }
+            }
+        }
+        return newKings > oldKings;
+    }
+
+    public boolean aiStep(Vector<Node> successors) {
         Vector<Node> bestNodes = new Vector<Node>();
-        Vector<Node> successors = space.getSuccessors(currentNode, aiPlayer);
         if (successors.isEmpty()) {
             return true;
         } else {
@@ -29,7 +43,7 @@ public class CheckersGame {
                 bestNodes.addAll(successors);
             } else {
                 for (Node newNode : successors) {
-                    newNode.evaluation = evaluateNode(newNode, aiPlayer, difficulty, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    newNode.evaluation = evaluateNode(newNode, activePlayer, difficulty, Integer.MIN_VALUE, Integer.MAX_VALUE);
                     if (newNode.evaluation == maxValue) {
                         bestNodes.add(newNode);
                     } else if (newNode.evaluation > maxValue) {
@@ -42,9 +56,19 @@ public class CheckersGame {
 
             int randomIndex = (int) (Math.random() * bestNodes.size());
             currentNode = bestNodes.get(randomIndex);
-            activePlayer = -activePlayer;
             return false;
         }
+    }
+
+    public int[] movedCheckerPosition() {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 4; col++) {
+                if (currentNode.getState()[row][col] != null && currentNode.parent.getState()[row][col] == null) {
+                    return new int[]{row, col};
+                }
+            }
+        }
+        return null;
     }
 
     public CheckersSpace getSpace() {

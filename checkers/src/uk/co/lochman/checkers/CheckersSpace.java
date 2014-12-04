@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.co.lochman.checkers;
 
 import java.util.Vector;
@@ -35,6 +30,62 @@ public class CheckersSpace {
 //            {null, null, new Checker(-1), null}
 //        };
         return new Node(state, null);
+    }
+
+    public boolean jumpAvailable(Node parent, int player) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (parent.getState()[i][j] != null && parent.getState()[i][j].getColor() == player) {
+                    if (player == 1) {
+                        if (!checkForWhiteJumps(i, j, player, parent).isEmpty()) {
+                            return true;
+                        } else if (parent.getState()[i][j].isKing() && !checkForBlackJumps(i, j, player, parent).isEmpty()) {
+                            return true;
+                        }
+                    } else if (player == -1) {
+                        if (!checkForBlackJumps(i, j, player, parent).isEmpty()) {
+                            return true;
+                        } else if (parent.getState()[i][j].isKing() && !checkForWhiteJumps(i, j, player, parent).isEmpty()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean jumpAvailable(Node parent, int player, int row, int col) {
+        if (player == 1) {
+            if (!checkForWhiteJumps(row, col, player, parent).isEmpty()) {
+                return true;
+            } else if (parent.getState()[row][col].isKing() && !checkForBlackJumps(row, col, player, parent).isEmpty()) {
+                return true;
+            }
+        } else if (player == -1) {
+            if (!checkForBlackJumps(row, col, player, parent).isEmpty()) {
+                return true;
+            } else if (parent.getState()[row][col].isKing() && !checkForWhiteJumps(row, col, player, parent).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Vector<Node> getJumpsForChecker(Node parent, int player, int row, int col) {
+        Vector<Node> jumps = new Vector<Node>();
+        if (player == 1) {
+            jumps.addAll(checkForWhiteJumps(row, col, player, parent));
+            if (parent.getState()[row][col].isKing()) {
+                jumps.addAll(checkForBlackJumps(row, col, player, parent));
+            }
+        } else if (player == -1) {
+            jumps.addAll(checkForBlackJumps(row, col, player, parent));
+            if (parent.getState()[row][col].isKing()) {
+                jumps.addAll(checkForWhiteJumps(row, col, player, parent));
+            }
+        }
+        return jumps;
     }
 
     public Vector<Node> getSuccessors(Node parent, int player) {
@@ -215,12 +266,7 @@ public class CheckersSpace {
                         state[row + 2][col + 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row + 1][col + 1] = null;
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else if (col < 3) {
                     if (parent.getState()[row + 1][col + 1] != null && parent.getState()[row + 1][col + 1].getColor() == -player && parent.getState()[row + 2][col + 1] == null) {
@@ -228,24 +274,14 @@ public class CheckersSpace {
                         state[row + 2][col + 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row + 1][col + 1] = null;
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                     if (parent.getState()[row + 1][col] != null && parent.getState()[row + 1][col].getColor() == -player && parent.getState()[row + 2][col - 1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row + 2][col - 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row + 1][col] = null;
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else {
                     if (parent.getState()[row + 1][col] != null && parent.getState()[row + 1][col].getColor() == -player && parent.getState()[row + 2][col - 1] == null) {
@@ -253,12 +289,7 @@ public class CheckersSpace {
                         state[row + 2][col - 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row + 1][col] = null;
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 }
             } else {
@@ -271,12 +302,7 @@ public class CheckersSpace {
                         if (row == 5) {
                             state[row + 2][col + 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else if (col < 3) {
                     if (parent.getState()[row + 1][col] != null && parent.getState()[row + 1][col].getColor() == -player && parent.getState()[row + 2][col + 1] == null) {
@@ -287,12 +313,7 @@ public class CheckersSpace {
                         if (row == 5) {
                             state[row + 2][col + 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                     if (parent.getState()[row + 1][col - 1] != null && parent.getState()[row + 1][col - 1].getColor() == -player && parent.getState()[row + 2][col - 1] == null) {
                         Checker state[][] = parent.getStateCopy();
@@ -302,12 +323,7 @@ public class CheckersSpace {
                         if (row == 5) {
                             state[row + 2][col - 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else {
                     if (parent.getState()[row + 1][col - 1] != null && parent.getState()[row + 1][col - 1].getColor() == -player && parent.getState()[row + 2][col - 1] == null) {
@@ -318,12 +334,7 @@ public class CheckersSpace {
                         if (row == 5) {
                             state[row + 2][col - 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForWhiteJumps(row + 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 }
             }
@@ -344,12 +355,7 @@ public class CheckersSpace {
                         if (row == 2) {
                             state[row - 2][col + 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else if (col < 3) {
                     if (parent.getState()[row - 1][col + 1] != null && parent.getState()[row - 1][col + 1].getColor() == -player && parent.getState()[row - 2][col + 1] == null) {
@@ -360,12 +366,7 @@ public class CheckersSpace {
                         if (row == 2) {
                             state[row - 2][col + 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                     if (parent.getState()[row - 1][col] != null && parent.getState()[row - 1][col].getColor() == -player && parent.getState()[row - 2][col - 1] == null) {
                         Checker state[][] = parent.getStateCopy();
@@ -375,12 +376,7 @@ public class CheckersSpace {
                         if (row == 2) {
                             state[row - 2][col - 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else {
                     if (parent.getState()[row - 1][col] != null && parent.getState()[row - 1][col].getColor() == -player && parent.getState()[row - 2][col - 1] == null) {
@@ -391,12 +387,7 @@ public class CheckersSpace {
                         if (row == 2) {
                             state[row - 2][col - 1].setKing(true);
                         }
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 }
             } else {
@@ -406,12 +397,7 @@ public class CheckersSpace {
                         state[row - 2][col + 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row - 1][col] = null;
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else if (col < 3) {
                     if (parent.getState()[row - 1][col] != null && parent.getState()[row - 1][col].getColor() == -player && parent.getState()[row - 2][col + 1] == null) {
@@ -419,24 +405,14 @@ public class CheckersSpace {
                         state[row - 2][col + 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row - 1][col] = null;
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col + 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                     if (parent.getState()[row - 1][col - 1] != null && parent.getState()[row - 1][col - 1].getColor() == -player && parent.getState()[row - 2][col - 1] == null) {
                         Checker state[][] = parent.getStateCopy();
                         state[row - 2][col - 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row - 1][col - 1] = null;
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 } else {
                     if (parent.getState()[row - 1][col - 1] != null && parent.getState()[row - 1][col - 1].getColor() == -player && parent.getState()[row - 2][col - 1] == null) {
@@ -444,12 +420,7 @@ public class CheckersSpace {
                         state[row - 2][col - 1] = state[row][col].getCopy();
                         state[row][col] = null;
                         state[row - 1][col - 1] = null;
-                        Vector<Node> longJumps = checkForBlackJumps(row - 2, col - 1, player, new Node(state, parent));
-                        if (longJumps.isEmpty()) {
-                            jumps.add(new Node(state, parent));
-                        } else {
-                            jumps.addAll(longJumps);
-                        }
+                        jumps.add(new Node(state, parent));
                     }
                 }
             }

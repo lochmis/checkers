@@ -48,6 +48,7 @@ public class CheckersGUI extends JFrame implements ActionListener {
     boolean highlightMoves = false;
     boolean highlightCheckers = false;
     Timer timer;
+    boolean jumped;
 
     public CheckersGUI() {
         super("Checkers by Radek Lochman");
@@ -62,10 +63,11 @@ public class CheckersGUI extends JFrame implements ActionListener {
         game = new CheckersGame();
         activeBoard = new CheckerSquare[8][4];
         dragging = false;
+        jumped = false;
 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //necesary to exit the program upon closing the window
-        this.setSize(700, 520); //set the size of the window
-        this.setResizable(false); //lock the size of the window
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(700, 520);
+        this.setResizable(false);
 
         pane = this.getContentPane();
         pane.setLayout(new BorderLayout());
@@ -105,7 +107,7 @@ public class CheckersGUI extends JFrame implements ActionListener {
         RMenu.add(difficulty);
 
         try {
-            mainGrid = new ImagePanel(ImageIO.read(getClass().getClassLoader().getResource("resources/checkersboard.png")));//new JPanel();
+            mainGrid = new ImagePanel(ImageIO.read(getClass().getClassLoader().getResource("resources/checkersboard.png")));
         } catch (IOException ex) {
             Logger.getLogger(CheckersGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -118,128 +120,8 @@ public class CheckersGUI extends JFrame implements ActionListener {
         setupSquares();
         setupGameBoard();
         setVisible(true);
-        unlockCheckers();
-    }
-
-    public void unlockCheckers() {
-        Vector<Node> toUnlock = game.getSpace().getSuccessors(game.getCurrentNode(), game.activePlayer);
-        if (toUnlock.isEmpty()) {
-            JOptionPane.showMessageDialog(mainGrid, "Sorry! You've Lost!!!");
-        }
-        for (Node successor : toUnlock) {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 4; j++) {
-                    if (successor.getState()[i][j] == null && activeBoard[i][j].player != 0 && game.activePlayer == activeBoard[i][j].player) {
-                        activeBoard[i][j].unlock();
-                    }
-                }
-            }
-        }
-    }
-
-    public void unlockPossibleMoves(int row, int col) {
         possibleMoves = game.getSpace().getSuccessors(game.getCurrentNode(), game.activePlayer);
-        for (Node successor : possibleMoves) {
-            if (successor.getState()[row][col] == null) {
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 4; j++) {
-                        if (successor.getState()[i][j] != null && activeBoard[i][j].player == 0) {
-                            activeBoard[i][j].unlock(successor);
-                        }
-                    }
-                }
-            }
-        }
-        mainGrid.updateUI();
-    }
-
-    public void highlightCheckers() {
-        Vector<Node> toHighlight = game.getSpace().getSuccessors(game.getCurrentNode(), game.activePlayer);
-        for (Node successor : toHighlight) {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 4; j++) {
-                    if (successor.getState()[i][j] == null && activeBoard[i][j].player != 0 && game.activePlayer == activeBoard[i][j].player) {
-                        activeBoard[i][j].setOpaque(true);
-                    }
-                }
-            }
-        }
-    }
-
-    public void highlightPossibleMoves() {
-        Vector<Node> toHighlight = game.getSpace().getSuccessors(game.getCurrentNode(), game.activePlayer);
-        for (Node successor : toHighlight) {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 4; j++) {
-                    if (successor.getState()[i][j] != null && activeBoard[i][j].player == 0) {
-                        activeBoard[i][j].setOpaque(true);
-                    }
-                }
-            }
-        }
-        mainGrid.updateUI();
-    }
-
-    public void refreshColors() {
-        resetColors();
-        if (highlightCheckers) {
-            highlightCheckers();
-        }
-        if (highlightMoves) {
-            highlightPossibleMoves();
-        }
-    }
-
-    public void lockAll() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 4; j++) {
-                activeBoard[i][j].lock();
-                mainGrid.updateUI();
-            }
-        }
-    }
-
-    public void resetColors() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 4; j++) {
-                activeBoard[i][j].setOpaque(false);
-                mainGrid.updateUI();
-            }
-        }
-    }
-
-    public void refreshBoard() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 4; j++) {
-                if (game.getCurrentNode().getState()[i][j] == null) {
-                    activeBoard[i][j].changePlayer(null);
-                } else {
-                    activeBoard[i][j].changePlayer(game.getCurrentNode().getState()[i][j]);
-                }
-            }
-        }
-    }
-
-    public void changeCursor() {
-        if (!dragging) {
-            mainGrid.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        } else {
-            try {
-                Image image = ImageIO.read(getClass().getClassLoader().getResource("resources/white.png"));
-                if (game.activePlayer == -1) {
-                    image = ImageIO.read(getClass().getClassLoader().getResource("resources/black.png"));
-                }
-                Toolkit toolkit = Toolkit.getDefaultToolkit();
-                Cursor c = toolkit.createCustomCursor(image, new Point(mainGrid.getX(), mainGrid.getY()), "img");
-                mainGrid.setCursor(c);
-            } catch (IOException ex) {
-                Logger.getLogger(CheckerListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
-    public void refreshGame(int row, int col) {
-        game.setCurrentNode(activeBoard[row][col].getSuccessor());
+        unlockCheckers();
     }
 
     private void setupSquares() {
@@ -275,12 +157,143 @@ public class CheckersGUI extends JFrame implements ActionListener {
         }
     }
 
+    public void unlockCheckers() {
+        if (possibleMoves.isEmpty()) {
+            JOptionPane.showMessageDialog(mainGrid, "Sorry! You've Lost!!!");
+        }
+        for (Node successor : possibleMoves) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (successor.getState()[i][j] == null && activeBoard[i][j].player != 0 && game.activePlayer == activeBoard[i][j].player) {
+                        activeBoard[i][j].unlock();
+                        mainGrid.updateUI();
+                    }
+                }
+            }
+        }
+    }
+
+    public void unlockPossibleMoves(int row, int col) {
+        for (Node successor : possibleMoves) {
+            if (successor.getState()[row][col] == null) {
+                for (int i = 0; i < 8; i++) {
+                    for (int j = 0; j < 4; j++) {
+                        if (successor.getState()[i][j] != null && activeBoard[i][j].player == 0) {
+                            activeBoard[i][j].unlock(successor);
+                            mainGrid.updateUI();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void highlightCheckers() {
+        for (Node successor : possibleMoves) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (successor.getState()[i][j] == null && activeBoard[i][j].player != 0 && game.activePlayer == activeBoard[i][j].player) {
+                        activeBoard[i][j].setOpaque(true);
+                        mainGrid.updateUI();
+                    }
+                }
+            }
+        }
+    }
+
+    public void highlightPossibleMoves() {
+        for (Node successor : possibleMoves) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (successor.getState()[i][j] != null && activeBoard[i][j].player == 0) {
+                        activeBoard[i][j].setOpaque(true);
+                        mainGrid.updateUI();
+                    }
+                }
+            }
+        }
+    }
+
+    public void refreshColors() {
+        resetColors();
+        if (highlightCheckers) {
+            highlightCheckers();
+        }
+        if (highlightMoves) {
+            highlightPossibleMoves();
+        }
+    }
+
+    public void lockAll() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 4; j++) {
+                activeBoard[i][j].lock();
+            }
+        }
+    }
+
+    public void resetColors() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 4; j++) {
+                activeBoard[i][j].setOpaque(false);
+                mainGrid.updateUI();
+            }
+        }
+    }
+
+    public void refreshBoard() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 4; j++) {
+                activeBoard[i][j].changePlayer(game.getCurrentNode().getState()[i][j]);
+                mainGrid.updateUI();
+            }
+        }
+    }
+
+    public void changeCursor() {
+        if (!dragging) {
+            mainGrid.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        } else {
+            try {
+                Image image = ImageIO.read(getClass().getClassLoader().getResource("resources/white.png"));
+                if (game.activePlayer == -1) {
+                    image = ImageIO.read(getClass().getClassLoader().getResource("resources/black.png"));
+                }
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                Cursor c = toolkit.createCustomCursor(image, new Point(mainGrid.getX(), mainGrid.getY()), "img");
+                mainGrid.setCursor(c);
+            } catch (IOException ex) {
+                Logger.getLogger(CheckerListener.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public void refreshGame(int row, int col) {
+        game.setCurrentNode(activeBoard[row][col].getSuccessor());
+    }
+
     public void aiTurn() {
-        boolean aiLost = game.aiTurn();
+        if (game.getSpace().jumpAvailable(game.getCurrentNode(), game.activePlayer)) {
+            jumped = true;
+        }
+        boolean aiLost = game.aiStep(possibleMoves);
         refreshBoard();
         if (aiLost) {
             JOptionPane.showMessageDialog(mainGrid, "Congratulations! You've won!!!");
+        } else if (jumped && !game.newKing() && game.getSpace().jumpAvailable(game.getCurrentNode(), game.activePlayer, game.movedCheckerPosition()[0], game.movedCheckerPosition()[1])) {
+            game.printState(game.getCurrentNode());
+            possibleMoves = game.getSpace().getJumpsForChecker(game.getCurrentNode(), game.activePlayer, game.movedCheckerPosition()[0], game.movedCheckerPosition()[1]);
+            refreshBoard();
+            timer = new Timer(1000, this);
+            timer.setCoalesce(false);
+            timer.setRepeats(false);
+            timer.start();
         } else {
+            game.printState(game.getCurrentNode());
+            game.activePlayer = -game.activePlayer;
+            jumped = game.getSpace().jumpAvailable(game.getCurrentNode(), game.activePlayer);
+            possibleMoves = game.getSpace().getSuccessors(game.getCurrentNode(), game.activePlayer);
+            refreshBoard();
             unlockCheckers();
         }
         refreshColors();
@@ -288,6 +301,106 @@ public class CheckersGUI extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         aiTurn();
+    }
+
+}
+
+class CheckerListener implements MouseListener {
+
+    int row;
+    int col;
+    CheckersGUI gui;
+
+    public CheckerListener(int row, int col, CheckersGUI gui) {
+        this.row = row;
+        this.col = col;
+        this.gui = gui;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (!gui.activeBoard[row][col].isLocked() && !gui.dragging) {
+            gui.lockAll();
+            gui.unlockPossibleMoves(row, col);
+            gui.activeBoard[row][col].changePlayer(null);
+            gui.dragging = true;
+            gui.changeCursor();
+            gui.game.printState(gui.game.getCurrentNode());
+            gui.refreshColors();
+        } else if (!gui.activeBoard[row][col].isLocked() && gui.dragging) {
+            gui.lockAll();
+            gui.activeBoard[row][col].changePlayer(gui.activeBoard[row][col].getSuccessor().getState()[row][col]);
+            gui.dragging = false;
+            gui.changeCursor();
+            gui.refreshGame(row, col);
+
+            if (gui.jumped && !gui.game.newKing() && gui.game.getSpace().jumpAvailable(gui.game.getCurrentNode(), gui.game.activePlayer, row, col)) {
+                gui.game.printState(gui.game.getCurrentNode());
+                gui.possibleMoves = gui.game.getSpace().getJumpsForChecker(gui.game.getCurrentNode(), gui.game.activePlayer, row, col);
+                gui.refreshBoard();
+                gui.refreshColors();
+                gui.unlockCheckers();
+            } else {
+                gui.jumped = false;
+                gui.game.activePlayer = -gui.game.activePlayer;
+                gui.possibleMoves = gui.game.getSpace().getSuccessors(gui.game.getCurrentNode(), gui.game.activePlayer);
+                gui.refreshBoard();
+                gui.resetColors();
+                gui.game.printState(gui.game.getCurrentNode());
+                gui.timer = new Timer(1000, (ActionListener) gui);
+                gui.timer.setCoalesce(false);
+                gui.timer.setRepeats(false);
+                gui.timer.start();
+            }
+        } else if (gui.activeBoard[row][col].isLocked() && !gui.dragging) {
+            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move this one.\nAll available moves has been highlighted.", "Invalid move",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (gui.activeBoard[row][col].isLocked() && gui.dragging) {
+            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move here.\nAll available moves has been highlighted.", "Invalid move",
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+//        if (!gui.activeBoard[row][col].isLocked()) {
+//            gui.resetColors();
+//            gui.changeCursor();
+//            gui.unlockPossibleMoves(row, col);
+//            gui.activeBoard[row][col].changePlayer(null);
+//            gui.game.printState(gui.game.getCurrentNode());
+//        } else if (gui.activeBoard[row][col].isLocked()) {
+//            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move this one.\nAll available moves has been highlighted.", "Invalid move",
+//                    JOptionPane.WARNING_MESSAGE);
+//        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+//        if (!gui.activeBoard[row][col].isLocked()) {
+//            gui.resetColors();
+//            gui.changeCursor();
+//            gui.activeBoard[row][col].changePlayer(gui.activeBoard[row][col].getSuccessor().getState()[row][col]);
+//            if (gui.game.getCurrentNode().getState()[row][col] == null) {
+//                gui.game.activePlayer = -gui.game.activePlayer;
+//                gui.refreshGame(row, col);
+//                gui.refreshBoard();
+//            }
+//            gui.game.printState(gui.game.getCurrentNode());
+//            gui.aiTurn();
+//            //gui.unlockCheckers();
+//        } else if (gui.activeBoard[row][col].isLocked()) {
+//            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move here.\nAll available moves has been highlighted.", "Invalid move",
+//                    JOptionPane.WARNING_MESSAGE);
+//        }
+    }
+
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    public void mouseExited(MouseEvent e) {
+
     }
 
 }
@@ -425,8 +538,9 @@ class NewGameListener implements ActionListener {
         gui.dragging = false;
         gui.lockAll();
         gui.refreshBoard();
-        gui.unlockCheckers();
         gui.changeCursor();
+        gui.possibleMoves = gui.game.getSpace().getSuccessors(gui.game.getCurrentNode(), gui.game.activePlayer);
+        gui.unlockCheckers();
     }
 
 }
@@ -456,98 +570,6 @@ class DifficultyListener implements ChangeListener {
             }
 
         }
-    }
-
-}
-
-class CheckerListener implements MouseListener {
-
-    int row;
-    int col;
-    CheckersGUI gui;
-
-    public CheckerListener(int row, int col, CheckersGUI gui) {
-        this.row = row;
-        this.col = col;
-        this.gui = gui;
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        if (!gui.activeBoard[row][col].isLocked() && !gui.dragging) {
-            gui.lockAll();
-            gui.unlockPossibleMoves(row, col);
-            gui.activeBoard[row][col].changePlayer(null);
-            gui.dragging = true;
-            gui.changeCursor();
-            gui.game.printState(gui.game.getCurrentNode());
-            gui.refreshColors();
-        } else if (!gui.activeBoard[row][col].isLocked() && gui.dragging) {
-            gui.lockAll();
-            gui.activeBoard[row][col].changePlayer(gui.activeBoard[row][col].getSuccessor().getState()[row][col]);
-            gui.dragging = false;
-            gui.changeCursor();
-            if (gui.game.getCurrentNode().getState()[row][col] == null) {
-                gui.game.activePlayer = -gui.game.activePlayer;
-                gui.refreshGame(row, col);
-                gui.refreshBoard();
-                gui.resetColors();
-            }
-            gui.game.printState(gui.game.getCurrentNode());
-            gui.timer = new Timer(1000, (ActionListener) gui);
-            gui.timer.setCoalesce(false);
-            gui.timer.setRepeats(false);
-            gui.timer.start();
-            //gui.unlockCheckers();
-        } else if (gui.activeBoard[row][col].isLocked() && !gui.dragging) {
-            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move this one.\nAll available moves has been highlighted.", "Invalid move",
-                    JOptionPane.WARNING_MESSAGE);
-        } else if (gui.activeBoard[row][col].isLocked() && gui.dragging) {
-            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move here.\nAll available moves has been highlighted.", "Invalid move",
-                    JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-//        if (!gui.activeBoard[row][col].isLocked()) {
-//            gui.resetColors();
-//            gui.changeCursor();
-//            gui.unlockPossibleMoves(row, col);
-//            gui.activeBoard[row][col].changePlayer(null);
-//            gui.game.printState(gui.game.getCurrentNode());
-//        } else if (gui.activeBoard[row][col].isLocked()) {
-//            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move this one.\nAll available moves has been highlighted.", "Invalid move",
-//                    JOptionPane.WARNING_MESSAGE);
-//        }
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-//        if (!gui.activeBoard[row][col].isLocked()) {
-//            gui.resetColors();
-//            gui.changeCursor();
-//            gui.activeBoard[row][col].changePlayer(gui.activeBoard[row][col].getSuccessor().getState()[row][col]);
-//            if (gui.game.getCurrentNode().getState()[row][col] == null) {
-//                gui.game.activePlayer = -gui.game.activePlayer;
-//                gui.refreshGame(row, col);
-//                gui.refreshBoard();
-//            }
-//            gui.game.printState(gui.game.getCurrentNode());
-//            gui.aiTurn();
-//            //gui.unlockCheckers();
-//        } else if (gui.activeBoard[row][col].isLocked()) {
-//            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move here.\nAll available moves has been highlighted.", "Invalid move",
-//                    JOptionPane.WARNING_MESSAGE);
-//        }
-    }
-
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    public void mouseExited(MouseEvent e) {
-
     }
 
 }
