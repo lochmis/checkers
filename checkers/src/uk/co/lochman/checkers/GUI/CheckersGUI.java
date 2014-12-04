@@ -99,12 +99,21 @@ public class CheckersGUI extends JFrame implements ActionListener {
         showMoves.addActionListener(new ShowMovesListener(this));
         RMenuT.add(showMoves);
 
+        JPanel RMenuB = new JPanel();
+        RMenuB.setLayout(new GridLayout(5, 0));
+        RMenu.add(RMenuB);
+
+        JLabel difficultyLabel = new JLabel("Difficulty");
+        difficultyLabel.setHorizontalAlignment(JTextField.CENTER);
+        difficultyLabel.setFont(new Font("sansserif", Font.BOLD, 14));
+
         JSlider difficulty = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
         difficulty.addChangeListener(new DifficultyListener(this));
         difficulty.setMajorTickSpacing(1);
         difficulty.setPaintLabels(true);
         difficulty.setPaintTicks(true);
-        RMenu.add(difficulty);
+        RMenuB.add(difficultyLabel);
+        RMenuB.add(difficulty);
 
         try {
             mainGrid = new ImagePanel(ImageIO.read(getClass().getClassLoader().getResource("resources/checkersboard.png")));
