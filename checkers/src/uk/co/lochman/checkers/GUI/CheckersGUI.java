@@ -259,9 +259,10 @@ public class CheckersGUI extends JFrame implements ActionListener {
         }
     }
 
-    public void changeCursor() {
+    public void changeCursor(int x, int y) {
         if (!dragging) {
             mainGrid.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            mainGrid.updateUI();
         } else {
             try {
                 Image image = ImageIO.read(getClass().getClassLoader().getResource("resources/white.png"));
@@ -269,8 +270,9 @@ public class CheckersGUI extends JFrame implements ActionListener {
                     image = ImageIO.read(getClass().getClassLoader().getResource("resources/black.png"));
                 }
                 Toolkit toolkit = Toolkit.getDefaultToolkit();
-                Cursor c = toolkit.createCustomCursor(image, new Point(mainGrid.getX(), mainGrid.getY()), "img");
+                Cursor c = toolkit.createCustomCursor(image, new Point((30), (30)), "img");
                 mainGrid.setCursor(c);
+                mainGrid.updateUI();
             } catch (IOException ex) {
                 Logger.getLogger(CheckerListener.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -333,14 +335,14 @@ class CheckerListener implements MouseListener {
             gui.unlockPossibleMoves(row, col);
             gui.activeBoard[row][col].changePlayer(null);
             gui.dragging = true;
-            gui.changeCursor();
+            gui.changeCursor(row, col);
             gui.game.printState(gui.game.getCurrentNode());
             gui.refreshColors();
         } else if (!gui.activeBoard[row][col].isLocked() && gui.dragging) {
             gui.lockAll();
             gui.activeBoard[row][col].changePlayer(gui.activeBoard[row][col].getSuccessor().getState()[row][col]);
             gui.dragging = false;
-            gui.changeCursor();
+            gui.changeCursor(row, col);
             gui.refreshGame(row, col);
 
             if (gui.jumped && !gui.game.newKing() && gui.game.getSpace().jumpAvailable(gui.game.getCurrentNode(), gui.game.activePlayer, row, col)) {
@@ -362,10 +364,9 @@ class CheckerListener implements MouseListener {
                 gui.timer.start();
             }
         } else if (gui.activeBoard[row][col].isLocked() && !gui.dragging) {
-            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move this one.\nAll available moves has been highlighted.", "Invalid move",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Sorry, you can't move this one.\nYou can highlight available checkers by help button.", "Invalid move", JOptionPane.WARNING_MESSAGE);
         } else if (gui.activeBoard[row][col].isLocked() && gui.dragging) {
-            JOptionPane.showMessageDialog(gui.mainGrid, "Sorry, you can't move here.\nAll available moves has been highlighted.", "Invalid move",
+            JOptionPane.showMessageDialog(null, "Sorry, you can't move here.\nYou can highlight available moves by help button.", "Invalid move",
                     JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -450,7 +451,7 @@ class ShowMovesListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         Object[] options = {"ON", "OFF"};
-        int decision = JOptionPane.showOptionDialog(gui.mainGrid,
+        int decision = JOptionPane.showOptionDialog(null,
                 "This will highlight all checkers that\n"
                 + "can legally move.\n"
                 + "Do you really want to hightlight them?",
@@ -487,11 +488,11 @@ class ShowCheckersListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         Object[] options = {"ON", "OFF"};
-        int decision = JOptionPane.showOptionDialog(gui.mainGrid,
-                "This will highlight all checkers that\n"
-                + "can legally move.\n"
+        int decision = JOptionPane.showOptionDialog(null,
+                "This will highlight all\n"
+                + "legal moves.\n"
                 + "Do you really want to hightlight them?",
-                "Highlight checkers that can move",
+                "Highlight legal moves",
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
@@ -547,7 +548,7 @@ class NewGameListener implements ActionListener {
         gui.dragging = false;
         gui.lockAll();
         gui.refreshBoard();
-        gui.changeCursor();
+        gui.changeCursor(0, 0);
         gui.possibleMoves = gui.game.getSpace().getSuccessors(gui.game.getCurrentNode(), gui.game.activePlayer);
         gui.unlockCheckers();
     }
