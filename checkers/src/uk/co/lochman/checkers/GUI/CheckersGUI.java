@@ -40,6 +40,7 @@ import uk.co.lochman.checkers.Node;
 public class CheckersGUI extends JFrame implements ActionListener {
 
     ImagePanel mainGrid;
+    JLabel currentPlayer = new JLabel("Current Player");
     CheckersGame game;
     CheckerSquare[][] activeBoard;
     boolean dragging;
@@ -114,6 +115,14 @@ public class CheckersGUI extends JFrame implements ActionListener {
         difficulty.setPaintTicks(true);
         RMenuB.add(difficultyLabel);
         RMenuB.add(difficulty);
+        
+        try {
+            currentPlayer.setIcon(new ImageIcon(ImageIO.read(getClass().getClassLoader().getResource("resources/white.png"))));
+        } catch (IOException ex) {
+            Logger.getLogger(CheckersGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        RMenuB.add(currentPlayer);
 
         try {
             mainGrid = new ImagePanel(ImageIO.read(getClass().getClassLoader().getResource("resources/checkersboard.png")));
@@ -131,6 +140,19 @@ public class CheckersGUI extends JFrame implements ActionListener {
         setVisible(true);
         possibleMoves = game.getSpace().getSuccessors(game.getCurrentNode(), game.activePlayer);
         unlockCheckers();
+    }
+    
+    public void changePlayer(){
+        game.activePlayer = -game.activePlayer;
+        try {
+            if (game.activePlayer == 1){
+                currentPlayer.setIcon(new ImageIcon(ImageIO.read(getClass().getClassLoader().getResource("resources/white.png"))));
+            } else {
+                currentPlayer.setIcon(new ImageIcon(ImageIO.read(getClass().getClassLoader().getResource("resources/black.png"))));
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(CheckersGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void setupSquares() {
@@ -301,7 +323,7 @@ public class CheckersGUI extends JFrame implements ActionListener {
             timer.start();
         } else {
             game.printState(game.getCurrentNode());
-            game.activePlayer = -game.activePlayer;
+            changePlayer();
             jumped = game.getSpace().jumpAvailable(game.getCurrentNode(), game.activePlayer);
             possibleMoves = game.getSpace().getSuccessors(game.getCurrentNode(), game.activePlayer);
             refreshBoard();
@@ -353,7 +375,7 @@ class CheckerListener implements MouseListener {
                 gui.unlockCheckers();
             } else {
                 gui.jumped = false;
-                gui.game.activePlayer = -gui.game.activePlayer;
+                gui.changePlayer();
                 gui.possibleMoves = gui.game.getSpace().getSuccessors(gui.game.getCurrentNode(), gui.game.activePlayer);
                 gui.refreshBoard();
                 gui.resetColors();
@@ -544,7 +566,8 @@ class NewGameListener implements ActionListener {
 
     private void restartGame() {
         gui.game.setCurrentNode(gui.game.getSpace().getRoot());
-        gui.game.activePlayer = 1;
+        gui.game.activePlayer = -1;
+        gui.changePlayer();
         gui.dragging = false;
         gui.lockAll();
         gui.refreshBoard();

@@ -29,9 +29,9 @@ public class CheckersSearch {
         System.out.println("\n");
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 4; c++) {
-                if (node.getState()[r][c] != null){
+                if (node.getState()[r][c] != null) {
                     int player = node.getState()[r][c].getColor();
-                    if (node.getState()[r][c].isKing()){
+                    if (node.getState()[r][c].isKing()) {
                         pr(" ." + name(player) + "K");
                     } else {
                         pr(" . " + name(player));
@@ -43,16 +43,16 @@ public class CheckersSearch {
             pr("\n");
             r++;
             for (int c = 0; c < 4; c++) {
-                if (node.getState()[r][c] != null){
+                if (node.getState()[r][c] != null) {
                     int player = node.getState()[r][c].getColor();
-                    if (node.getState()[r][c].isKing()){
+                    if (node.getState()[r][c].isKing()) {
                         pr(name(player) + "K .");
                     } else {
                         pr(" " + name(player) + " .");
                     }
                 } else {
                     pr("   .");
-                }                
+                }
             }
             pr("\n");
         }
@@ -61,7 +61,7 @@ public class CheckersSearch {
 
     boolean wonFor(Checker[][] state, int player) {
         for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 4; col++){
+            for (int col = 0; col < 4; col++) {
                 if (state[row][col] != null && state[row][col].getColor() == -player) {
                     return false;
                 }
@@ -79,22 +79,22 @@ public class CheckersSearch {
         }
         return player;
     }
-    
+
     int evaluateState(Checker[][] state) {
         int whiteNumber = 0;
         int blackNumber = 0;
         for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 4; col++){
+            for (int col = 0; col < 4; col++) {
                 if (state[row][col] != null) {
-                    if (state[row][col].getColor() == 1){
+                    if (state[row][col].getColor() == 1) {
                         whiteNumber++;
-                        if (state[row][col].isKing()){
+                        if (state[row][col].isKing()) {
                             whiteNumber += 2;
                         }
                     }
-                    if (state[row][col].getColor() == -1){
+                    if (state[row][col].getColor() == -1) {
                         blackNumber++;
-                        if (state[row][col].isKing()){
+                        if (state[row][col].isKing()) {
                             blackNumber += 2;
                         }
                     }
@@ -128,7 +128,7 @@ public class CheckersSearch {
             if (-successor.evaluation > alpha) {
                 alpha = -successor.evaluation;
             }
-            if (alpha >= beta){
+            if (alpha >= beta) {
                 return alpha;
             }
         }
@@ -143,6 +143,7 @@ public class CheckersSearch {
         printState(node);
 
         while ((p = winnerOf(node.getState())) == 0) { /* while no winner */
+
             System.out.println(player + " is making a move");
             Vector<Node> successors = space.getSuccessors(node, player);
             int maxValue = -100;
@@ -161,7 +162,7 @@ public class CheckersSearch {
             } else {
                 bestNodes.addAll(successors);
             }
-            if (successors.isEmpty()) { 
+            if (successors.isEmpty()) {
                 p = -player;
                 break;
             } else {
